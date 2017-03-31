@@ -1,0 +1,16 @@
+sudo: required
+
+services:
+  - docker
+
+script:
+  - echo "no tests!"
+
+after_success:
+  - docker --version
+  - pip install --user awscli
+  - export PATH=$PATH:$HOME/.local/bin
+  - eval $(aws ecr get-login --region $REPOSITORY_REGION)
+  - docker build -t sentry-onpremise .
+  - docker tag sentry-onpremise:latest $REPOSITORY:v$TRAVIS_BUILD_NUMBER
+  - docker push $REPOSITORY:v$TRAVIS_BUILD_NUMBER
